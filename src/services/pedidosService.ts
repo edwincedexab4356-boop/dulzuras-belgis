@@ -295,11 +295,11 @@ export const pedidosService = {
         });
 
         // Register client info for CRM tracking
-        clientesService.registrarOActualizarClienteDesdePedido(createdPedido).catch(console.warn);
+        clientesService.registrarOActualizarClienteDesdePedido(createdPedido).catch(() => {});
 
         return createdPedido;
       } catch (error: any) {
-        console.warn('Aviso: Creación de pedido en Firestore falló, usando almacenamiento local:', error?.message || error);
+        // Fallback to local
       }
     }
 
@@ -312,7 +312,7 @@ export const pedidosService = {
     });
     list.unshift(localPedido);
     saveLocalPedidos(list);
-    clientesService.registrarOActualizarClienteDesdePedido(localPedido).catch(console.warn);
+    clientesService.registrarOActualizarClienteDesdePedido(localPedido).catch(() => {});
     return localPedido;
   },
 
@@ -380,11 +380,11 @@ export const pedidosService = {
             cliente: currentPedido.customerName || 'Cliente Pedido',
             usuario: 'Caja / Sistema',
             fecha: new Date().toISOString(),
-          }).catch(console.warn);
+          }).catch(() => {});
         }
         return;
       } catch (error: any) {
-        console.warn('Aviso: Error actualizando estado en Firestore, aplicando en local:', error?.message || error);
+        // Handled via local fallback
       }
     }
 
@@ -419,7 +419,7 @@ export const pedidosService = {
           cliente: currentPedido.customerName || 'Cliente Pedido',
           usuario: 'Caja / Sistema',
           fecha: new Date().toISOString(),
-        }).catch(console.warn);
+        }).catch(() => {});
       }
     }
   },

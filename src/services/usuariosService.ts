@@ -285,7 +285,7 @@ export const usuariosService = {
     window.addEventListener('delicias_usuarios_changed', handler);
 
     let unsubFirestore: (() => void) | null = null;
-    if (isFirebaseConfigured() && db && auth?.currentUser) {
+    if (isFirebaseConfigured() && db) {
       try {
         const colRef = collection(db, 'usuarios');
         unsubFirestore = onSnapshot(
@@ -355,9 +355,18 @@ export const usuariosService = {
       try {
         const userDocRef = doc(db, 'usuarios', uid);
         await setDoc(userDocRef, newDoc);
-      } catch (err) {
-        console.warn('Error creating user doc in Firestore:', err);
-        throw err;
+        console.log('✅ Usuario guardado exitosamente en Firestore:', uid);
+      } catch (err: any) {
+        console.error('❌ Error creando usuario en Firestore:', err);
+        const isPermission =
+          err?.code === 'permission-denied' ||
+          String(err?.message || '').toLowerCase().includes('permission');
+        if (isPermission) {
+          throw new Error(
+            'Firestore rechazó la creación del usuario por Reglas de Seguridad (permission-denied). Por favor revisa las Reglas en tu Consola de Firebase.'
+          );
+        }
+        throw new Error(err?.message || 'Error al guardar usuario en Firestore');
       }
     }
 
@@ -386,9 +395,19 @@ export const usuariosService = {
     if (isFirebaseConfigured() && db && idOrUid) {
       try {
         const userDocRef = doc(db, 'usuarios', idOrUid);
-        await updateDoc(userDocRef, patch);
-      } catch (err) {
-        console.warn('Error updating user doc in Firestore:', err);
+        await setDoc(userDocRef, patch, { merge: true });
+        console.log('✅ Usuario actualizado exitosamente en Firestore:', idOrUid);
+      } catch (err: any) {
+        console.error('❌ Error actualizando usuario en Firestore:', err);
+        const isPermission =
+          err?.code === 'permission-denied' ||
+          String(err?.message || '').toLowerCase().includes('permission');
+        if (isPermission) {
+          throw new Error(
+            'Firestore rechazó la actualización del usuario por Reglas de Seguridad (permission-denied). Revisa las Reglas en tu Consola de Firebase.'
+          );
+        }
+        throw new Error(err?.message || 'Error al actualizar usuario en Firestore');
       }
     }
 
@@ -411,8 +430,18 @@ export const usuariosService = {
       try {
         const userDocRef = doc(db, 'usuarios', idOrUid);
         await deleteDoc(userDocRef);
-      } catch (err) {
-        console.warn('Error deleting user doc in Firestore:', err);
+        console.log('✅ Usuario eliminado de Firestore:', idOrUid);
+      } catch (err: any) {
+        console.error('❌ Error eliminando usuario en Firestore:', err);
+        const isPermission =
+          err?.code === 'permission-denied' ||
+          String(err?.message || '').toLowerCase().includes('permission');
+        if (isPermission) {
+          throw new Error(
+            'Firestore rechazó la eliminación por Reglas de Seguridad (permission-denied). Revisa las Reglas en tu Consola de Firebase.'
+          );
+        }
+        throw new Error(err?.message || 'Error al eliminar usuario en Firestore');
       }
     }
 

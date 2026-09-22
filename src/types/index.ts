@@ -289,6 +289,9 @@ export interface ConfiguracionNegocio {
   promocionTexto?: string;
   promocionBadge?: string;
   promocionBotonTexto?: string;
+  promocionDescuento?: string;
+  promocionImagenUrl?: string;
+  promocionProductosIds?: string[]; // IDs de productos específicos en promoción
   // Terminal de Cajero y Políticas
   correoGenericoCajero?: string;
   cajerosPredefinidos?: string[];

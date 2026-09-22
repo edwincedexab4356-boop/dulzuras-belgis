@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "ConfiguracionNegocio": {
+      "title": "Configuración del Negocio",
+      "description": "Datos de identidad, horarios, promociones y personal de Delicias Belgi",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string" },
+        "telefono": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "direccion": { "type": "string" },
+        "ciudad": { "type": "string" },
+        "pais": { "type": "string" },
+        "email": { "type": "string" },
+        "moneda": { "type": "string" },
+        "simboloMoneda": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "heroTitulo": { "type": "string" },
+        "heroSubtitulo": { "type": "string" },
+        "cajerosPredefinidos": { "type": "array" },
+        "promocionActiva": { "type": "boolean" },
+        "promocionTitulo": { "type": "string" },
+        "promocionTexto": { "type": "string" },
+        "promocionDescuento": { "type": "string" },
+        "promocionImagenUrl": { "type": "string" }
+      }
+    },
+    "Usuario": {
+      "title": "Usuario del Sistema",
+      "description": "Cuentas de usuario con roles de administrador o cajero",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "nombre": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "cajero"] },
+        "rol": { "type": "string", "enum": ["admin", "cajero"] },
+        "activo": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/configuracion/negocio": {
+      "schema": "ConfiguracionNegocio",
+      "description": "Documento central de configuración del negocio"
+    },
+    "/usuarios/{userId}": {
+      "schema": "Usuario",
+      "description": "Colección de usuarios y personal del sistema"
+    }
+  }
+}

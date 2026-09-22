@@ -220,7 +220,13 @@ export const productosService = {
         saveLocalProductos(list);
         return created;
       } catch (error: any) {
-        console.warn('Aviso: Error guardando en Firebase Firestore, usando respaldo local:', error?.message || error);
+        console.error('❌ Error guardando producto en Firebase Firestore:', error);
+        const isPermission =
+          error?.code === 'permission-denied' ||
+          String(error?.message || '').toLowerCase().includes('permission');
+        if (isPermission) {
+          throw new Error('Firestore rechazó crear el producto por Reglas de Seguridad (permission-denied). Revisa las Reglas en Firebase Console.');
+        }
       }
     }
 
@@ -275,7 +281,13 @@ export const productosService = {
           await setDoc(invRef, invPayload, { merge: true });
         } catch (_) {}
       } catch (error: any) {
-        console.warn('Aviso: Producto actualizado en almacenamiento local (Firestore usando fallback):', error?.message || error);
+        console.error('❌ Error actualizando producto en Firestore:', error);
+        const isPermission =
+          error?.code === 'permission-denied' ||
+          String(error?.message || '').toLowerCase().includes('permission');
+        if (isPermission) {
+          throw new Error('Firestore rechazó actualizar el producto por Reglas de Seguridad (permission-denied). Revisa las Reglas en Firebase Console.');
+        }
       }
     }
 

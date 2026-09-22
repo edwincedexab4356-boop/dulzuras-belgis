@@ -174,9 +174,9 @@ export const VentasView: React.FC<VentasViewProps> = ({
   // Process POS Sale
   const handleFinalizarVenta = async () => {
     if (posCart.length === 0) return;
-    if (isAdmin && !canAdminBuy) {
+    if (isAdmin) {
       alert(
-        'Por política del negocio, la pantalla de administrador no tiene permitido realizar compras o emitir cobros de clientes. Esta función es de uso exclusivo para la terminal de cajero.'
+        'Por política del negocio, el Administrador puede registrar y gestionar productos, más no realizar ventas. La emisión de tickets y cobros en el POS son exclusivos para el rol de Cajero.'
       );
       return;
     }
@@ -338,7 +338,7 @@ export const VentasView: React.FC<VentasViewProps> = ({
                 : 'text-stone-600 hover:text-stone-900'
             }`}
           >
-            Punto de Venta (POS)
+            Punto de Venta (POS) {isAdmin && '(Solo Cajero)'}
           </button>
           <button
             onClick={() => setActiveSubTab('historial')}
@@ -366,11 +366,12 @@ export const VentasView: React.FC<VentasViewProps> = ({
 
       {/* Admin Information Note: Admin view restriction notice */}
       {isAdmin && activeSubTab === 'pos' && (
-        <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200/90 text-amber-900 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-          <span>
-            <strong>Modo Administrador:</strong> Esta terminal está habilitada para facturación del cajero en turno. El perfil administrativo audita transacciones y supervisa inventarios sin realizar compras de clientes.
-          </span>
+        <div className="p-3.5 rounded-2xl bg-amber-100/70 border border-amber-300 text-amber-950 text-xs flex items-center gap-2.5">
+          <AlertCircle className="w-5 h-5 text-amber-700 shrink-0" />
+          <div>
+            <strong className="block text-amber-900 font-bold">Acceso Restringido: El Administrador no realiza ventas</strong>
+            <span>El rol Administrador puede registrar y gestionar productos en el catálogo, pero <strong>no tiene permitido realizar cobros ni ventas</strong>. Para registrar una venta en caja, inicie sesión con una cuenta de Cajero.</span>
+          </div>
         </div>
       )}
 
@@ -514,10 +515,32 @@ export const VentasView: React.FC<VentasViewProps> = ({
                 );
               })}
             </div>
+            {/* Mobile floating button to jump down to checkout */}
+            {posCart.length > 0 && (
+              <div className="lg:hidden sticky bottom-4 z-20">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const ticketEl = document.getElementById('pos-ticket-checkout');
+                    ticketEl?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-pink-600 to-pink-700 text-white font-bold text-xs shadow-lg flex items-center justify-between cursor-pointer animate-in fade-in slide-in-from-bottom-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>{posCart.reduce((acc, it) => acc + it.cantidad, 0)} productos en factura</span>
+                  </div>
+                  <div className="flex items-center gap-1 font-serif text-sm font-extrabold">
+                    <span>{formatCurrency(total)}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Ticket / Cart Checkout Section */}
-          <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between space-y-4">
+          <div id="pos-ticket-checkout" className="lg:col-span-5 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between space-y-4">
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-stone-100">
                 <div className="flex items-center gap-2">
@@ -675,14 +698,14 @@ export const VentasView: React.FC<VentasViewProps> = ({
               </div>
 
               {/* Submit Sale Button or Admin Policy Warning */}
-              {isAdmin && !canAdminBuy ? (
-                <div className="p-3.5 rounded-xl bg-stone-100 border border-stone-200 text-stone-600 text-xs text-center space-y-1">
-                  <div className="font-bold flex items-center justify-center gap-1.5 text-stone-800">
-                    <ShieldCheck className="w-4 h-4 text-stone-500" />
-                    <span>Compras deshabilitadas en Pantalla de Admin</span>
+              {isAdmin ? (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs text-center space-y-1">
+                  <div className="font-bold flex items-center justify-center gap-1.5 text-amber-950">
+                    <ShieldCheck className="w-4 h-4 text-amber-700" />
+                    <span>Ventas restringidas para Administrador</span>
                   </div>
-                  <p className="text-[11px] text-stone-500 leading-snug">
-                    El rol de administrador está configurado para supervisión contable y auditoría sin emitir compras ni cobros. Para facturar productos, inicie jornada desde la terminal de cajero.
+                  <p className="text-[11px] text-amber-800 leading-snug">
+                    Por política del negocio, el Administrador puede registrar y gestionar productos, <strong>más no realizar ventas</strong>. La emisión de tickets y cobro en POS es de uso exclusivo para cajeros.
                   </p>
                 </div>
               ) : (
@@ -771,9 +794,93 @@ export const VentasView: React.FC<VentasViewProps> = ({
             )}
           </div>
 
-          {/* Table */}
+          {/* Table & Mobile Cards */}
           <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
+            {/* Mobile Card List (under md breakpoint) */}
+            <div className="block md:hidden divide-y divide-stone-100">
+              {filteredHistory.length === 0 ? (
+                <div className="p-8 text-center text-stone-400 text-xs">
+                  No hay ventas registradas que coincidan con la búsqueda.
+                </div>
+              ) : (
+                filteredHistory.map((venta, idx) => {
+                  const isAnulada = Boolean(venta.anulada);
+                  return (
+                    <div
+                      key={venta.id ? `mob-venta-${venta.id}-${idx}` : `mob-venta-${idx}`}
+                      className={`p-4 space-y-2.5 ${isAnulada ? 'bg-rose-50/30' : ''}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-xs font-bold text-stone-900">
+                              #{venta.id?.slice(-6) || 'VENTA'}
+                            </span>
+                            {isAnulada ? (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700">
+                                Anulada
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">
+                                Completada
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-stone-400 block mt-0.5">
+                            {formatFechaCorta(venta.createdAt || venta.fecha)}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-serif font-extrabold text-amber-950 text-base block">
+                            {formatCurrency(venta.total)}
+                          </span>
+                          <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600">
+                            {venta.metodoPago || 'Efectivo'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-stone-700 bg-stone-50 p-2.5 rounded-xl border border-stone-100">
+                        <div className="font-semibold text-stone-900 mb-0.5">
+                          Cliente: {venta.cliente || 'Cliente Ocasional'}
+                        </div>
+                        <div className="text-stone-500 text-[11px]">
+                          {venta.items && venta.items.length > 0
+                            ? venta.items.map((it) => `${it.cantidad}x ${it.nombre}`).join(', ')
+                            : `${venta.cantidad || 1}x ${venta.producto}`}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-1">
+                        <button
+                          onClick={() => setSelectedVentaTicket(venta)}
+                          className="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-700 hover:bg-stone-50 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Receipt className="w-3.5 h-3.5 text-stone-500" />
+                          <span>Ver Ticket</span>
+                        </button>
+                        {isAdmin && !isAnulada && (
+                          <button
+                            onClick={() => {
+                              setVentaToDelete(venta);
+                              setSecurityCode('');
+                              setDeleteErrorCode(null);
+                            }}
+                            className="px-3 py-1.5 rounded-lg border border-rose-200 text-rose-700 bg-rose-50/60 hover:bg-rose-100 text-xs font-bold flex items-center gap-1 cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Eliminar</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs text-stone-600">
                 <thead className="bg-stone-50 border-b border-stone-200 text-stone-700 font-bold uppercase tracking-wider text-[10px]">
                   <tr>
@@ -1091,9 +1198,16 @@ export const VentasView: React.FC<VentasViewProps> = ({
             </div>
 
             <div className="text-center py-2 border-b border-dashed border-stone-200">
-              <h4 className="font-serif font-bold text-stone-900 text-base">Dulzuras de Belgi's</h4>
-              <p className="text-[11px] text-pink-700 font-semibold italic">Repostería para todos tus eventos!!</p>
-              <p className="text-[10px] text-stone-500">Calle 2 ave. Bolívar, PH Bahía Limón, Colón</p>
+              {config?.logoUrl && (
+                <img
+                  src={config.logoUrl}
+                  alt={config?.nombre || "Logo"}
+                  className="max-h-12 w-auto max-w-[120px] mx-auto mb-1.5 object-contain"
+                />
+              )}
+              <h4 className="font-serif font-bold text-stone-900 text-base">{config?.nombre || "Dulzuras de Belgi's"}</h4>
+              <p className="text-[11px] text-pink-700 font-semibold italic">{config?.eslogan || 'Repostería para todos tus eventos!!'}</p>
+              <p className="text-[10px] text-stone-500">{config?.direccion || 'Calle 2 ave. Bolívar, PH Bahía Limón, Colón'}</p>
               <p className="text-[10px] text-stone-500 font-medium mt-1">
                 Cajero en turno: <strong>{selectedVentaTicket.vendedor || activeCajero}</strong>
               </p>
@@ -1102,7 +1216,7 @@ export const VentasView: React.FC<VentasViewProps> = ({
                 {formatFechaCorta(selectedVentaTicket.createdAt || selectedVentaTicket.fecha)}
               </p>
               <p className="text-[9px] text-stone-400 mt-1">
-                Marca debidamente registrada en el Registro Público de Panamá
+                {config?.marcaRegistradaTexto || 'Marca debidamente registrada en el Registro Público de Panamá'}
               </p>
             </div>
 

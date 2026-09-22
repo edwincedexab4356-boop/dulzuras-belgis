@@ -93,7 +93,15 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
 
         {/* Brand header */}
         <div className="text-center">
-          <BelgisLogo size={88} className="mx-auto mb-2" showDetails={false} />
+          {config?.logoUrl ? (
+            <img
+              src={config.logoUrl}
+              alt={config?.nombre || "Dulzuras de Belgi's"}
+              className="max-h-24 w-auto max-w-[220px] mx-auto mb-2 object-contain drop-shadow-md"
+            />
+          ) : (
+            <BelgisLogo size={88} className="mx-auto mb-2" showDetails={false} />
+          )}
           <h2 className="font-serif text-3xl font-extrabold text-stone-900 tracking-tight">
             {config?.nombre || "Dulzuras de Belgi's"}
           </h2>

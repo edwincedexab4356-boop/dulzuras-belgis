@@ -19,9 +19,13 @@ export const INITIAL_CONFIGURACION: ConfiguracionNegocio = {
   promocionTexto: 'Cotiza tus mesas de postres, cupcakes y pasteles personalizados con atención directa por WhatsApp.',
   promocionBadge: 'Eventos Especiales',
   promocionBotonTexto: 'Cotizar por WhatsApp',
+  promocionDescuento: 'Precios Especiales',
+  promocionImagenUrl: '',
+  promocionProductosIds: [],
   correoGenericoCajero: 'caja@dulzurasdebelgis.com',
   cajerosPredefinidos: ['Belgis Gómez', 'Edwin Cedeño', 'María Delgado', 'Carlos Pimentel'],
   permitirAdminRegistrarProductos: true,
+  permitirAdminCompras: false,
   paraLlevar: true,
   aDomicilio: true,
   horarios: {

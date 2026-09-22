@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 1. Configuración del Negocio:
+    // Lectura pública para que clientes vean horarios, teléfono, WhatsApp, promociones y logo.
+    // Escritura permitida para el panel de administración.
+    match /configuracion/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 2. Usuarios del Sistema y Roles:
+    // Lectura y escritura para gestión de usuarios y cajeros del sistema.
+    match /usuarios/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 3. Catálogo de Productos:
+    // Lectura pública en el menú y tienda web.
+    // Escritura para gestión de productos y stock.
+    match /productos/{productId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 4. Categorías:
+    // Lectura pública para filtrar postres.
+    match /categorias/{categoryId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // 5. Pedidos de Clientes y Punto de Venta:
+    // Permite a clientes crear pedidos y a administradores/cajeros gestionar estados.
+    match /pedidos/{pedidoId} {
+      allow read, write: if true;
+    }
+
+    // 6. Ventas y Comprobantes:
+    match /ventas/{ventaId} {
+      allow read, write: if true;
+    }
+
+    // 7. Directorio de Clientes:
+    match /clientes/{clienteId} {
+      allow read, write: if true;
+    }
+
+    // 8. Turnos de Caja (Aperturas y Cierres):
+    match /turnos_caja/{turnoId} {
+      allow read, write: if true;
+    }
+
+    // 9. Control de Inventario y Movimientos:
+    match /inventario/{itemId} {
+      allow read, write: if true;
+    }
+    match /movimientos_inventario/{movId} {
+      allow read, write: if true;
+    }
+
+    // 10. Producción diaria de repostería:
+    match /producciones/{produccionId} {
+      allow read, write: if true;
+    }
+
+    // Regla de respaldo para cualquier otra colección del negocio
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

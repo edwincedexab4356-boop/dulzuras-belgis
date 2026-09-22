@@ -25,8 +25,12 @@ export async function fileToCompressedBase64(
         return;
       }
 
-      // If SVG or small gif, keep as is
-      if (file.type === 'image/svg+xml' || (file.type === 'image/gif' && file.size < 500000)) {
+      // If SVG, gif or any image under 500KB, preserve 100% original without touching a single pixel
+      if (
+        file.type === 'image/svg+xml' ||
+        (file.type === 'image/gif' && file.size < 600000) ||
+        file.size < 500000
+      ) {
         resolve(result);
         return;
       }
@@ -64,11 +68,13 @@ export async function fileToCompressedBase64(
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Output as JPEG
-          const compressed = canvas.toDataURL('image/jpeg', quality);
+          // If PNG or WebP, preserve transparency instead of forcing JPEG
+          const isPng = file.type === 'image/png';
+          const outputType = isPng ? 'image/png' : 'image/jpeg';
+          const compressed = canvas.toDataURL(outputType, isPng ? undefined : quality);
           resolve(compressed);
         } catch (e) {
-          console.warn('Compression error, falling back to original:', e);
+          // Fallback to original if any error occurs
           resolve(result);
         }
       };

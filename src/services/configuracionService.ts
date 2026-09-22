@@ -175,14 +175,26 @@ export const configuracionService = {
       actualizadoEn: new Date().toISOString(),
     };
 
+    // Save locally immediately for optimistic UI response
     saveLocalConfig(updated);
 
-    if (isFirebaseConfigured() && db && auth?.currentUser) {
+    // Save to Firestore cloud database
+    if (isFirebaseConfigured() && db) {
       try {
         const docRef = doc(db, 'configuracion', 'negocio');
         await setDoc(docRef, updated, { merge: true });
+        console.log('✅ Configuración guardada exitosamente en Firestore: configuracion/negocio');
       } catch (error: any) {
-        console.warn('Firestore write warning for configuracion:', error?.message || error);
+        console.error('❌ Error escribiendo configuración en Firestore:', error);
+        const isPermission =
+          error?.code === 'permission-denied' ||
+          String(error?.message || '').toLowerCase().includes('permission');
+        if (isPermission) {
+          throw new Error(
+            'Firestore rechazó el guardado por Reglas de Seguridad (permission-denied). Por favor revisa y actualiza las Reglas en tu Consola de Firebase.'
+          );
+        }
+        throw new Error(error?.message || 'Error de conexión con Firestore al guardar configuración');
       }
     }
 

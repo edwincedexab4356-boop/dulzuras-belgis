@@ -21,7 +21,15 @@ export const Footer: React.FC<FooterProps> = ({ config, onGoToAdmin }) => {
           {/* Brand */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-3">
-              <BelgisLogo size={48} showDetails={false} />
+              {config.logoUrl ? (
+                <img
+                  src={config.logoUrl}
+                  alt={config.nombre || "Dulzuras de Belgi's"}
+                  className="h-12 w-auto max-w-[150px] object-contain drop-shadow-sm"
+                />
+              ) : (
+                <BelgisLogo size={48} showDetails={false} />
+              )}
               <div>
                 <span className="font-serif text-2xl font-bold text-white tracking-tight block">
                   {config.nombre || "Dulzuras de Belgi's"}

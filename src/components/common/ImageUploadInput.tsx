@@ -101,11 +101,11 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
       {/* Preview if exists */}
       {value ? (
         <div className="relative rounded-2xl overflow-hidden border border-stone-200 bg-stone-50 group">
-          <div className={`w-full ${previewHeight} flex items-center justify-center overflow-hidden`}>
+          <div className={`w-full ${previewHeight} flex items-center justify-center overflow-hidden bg-stone-100/60`}>
             <img
               src={value}
               alt="Vista previa"
-              className="w-full h-full object-cover"
+              className="max-h-full max-w-full object-contain p-2"
               onError={(e) => {
                 // If broken url, show placeholder icon
                 (e.target as HTMLElement).style.display = 'none';

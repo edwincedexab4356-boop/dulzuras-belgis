@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Plus, Check, Sparkles, MessageCircle } from 'lucide-react';
-import { Producto, CartItem } from '../../types';
+import { Search, Plus, Check, Sparkles, MessageCircle, Tag } from 'lucide-react';
+import { Producto, CartItem, ConfiguracionNegocio } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 
 interface MenuSectionProps {
   productos: Producto[];
   loading: boolean;
   cart: CartItem[];
+  config?: ConfiguracionNegocio;
   onAddToCart: (producto: Producto) => void;
   onOpenCart?: () => void;
 }
@@ -15,6 +16,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
   productos,
   loading,
   cart,
+  config,
   onAddToCart,
   onOpenCart,
 }) => {
@@ -201,6 +203,15 @@ export const MenuSection: React.FC<MenuSectionProps> = ({
                     <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white/95 text-stone-800 backdrop-blur-sm shadow-sm border border-stone-100">
                       {prod.categoria}
                     </span>
+
+                    {/* Promo badge if product is selected in active promotion */}
+                    {config?.promocionActiva !== false &&
+                      Boolean(prod.id && config?.promocionProductosIds?.includes(prod.id)) && (
+                        <span className="absolute bottom-2.5 left-3 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-pink-600 text-white shadow-sm flex items-center gap-1">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          <span>{config?.promocionBadge || 'OFERTA'}</span>
+                        </span>
+                      )}
                     {/* Stock badge */}
                     {isOutOfStock ? (
                       <span className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-600 text-white shadow-sm">

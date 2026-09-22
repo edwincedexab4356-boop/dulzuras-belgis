@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <img
                 src={config.logoUrl}
                 alt={config.nombre || "Dulzuras de Belgi's"}
-                className="w-12 h-12 rounded-full object-cover shadow-md border-2 border-lime-400 group-hover:scale-105 transition-transform"
+                className="h-12 sm:h-14 w-auto max-w-[160px] object-contain group-hover:scale-105 transition-transform drop-shadow-sm"
               />
             ) : (
               <BelgisLogo size={48} className="group-hover:scale-105 transition-transform" showDetails={false} />

@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   UserCheck,
 } from 'lucide-react';
-import { UserAuth, AdminTab } from '../../types';
+import { UserAuth, AdminTab, ConfiguracionNegocio } from '../../types';
 import { isFirebaseConfigured } from '../../services/firebase';
 import { normalizeRole, getRoleDisplayName } from '../../services/usuariosService';
 
@@ -25,6 +25,7 @@ interface AdminLayoutProps {
   currentTab: AdminTab;
   onSelectTab: (tab: AdminTab) => void;
   user: UserAuth;
+  config?: ConfiguracionNegocio;
   onLogout: () => void;
   onBackToPublic: () => void;
   children: React.ReactNode;
@@ -34,6 +35,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   currentTab,
   onSelectTab,
   user,
+  config,
   onLogout,
   onBackToPublic,
   children,
@@ -74,12 +76,20 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Mobile Top Bar */}
       <div className="md:hidden bg-stone-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white">
-            <Cake className="w-4 h-4" />
-          </div>
+          {config?.logoUrl ? (
+            <img
+              src={config.logoUrl}
+              alt="Logo"
+              className="h-8 w-auto max-w-[80px] object-contain"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white">
+              <Cake className="w-4 h-4" />
+            </div>
+          )}
           <div>
             <span className="font-serif font-bold text-sm tracking-tight block">
-              Delicias Belgi
+              {config?.nombre || 'Delicias Belgi'}
             </span>
             <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
               {roleDisplay}
@@ -95,22 +105,39 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         </button>
       </div>
 
+      {/* Mobile Backdrop when Sidebar is open */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-xs md:hidden"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-stone-900 text-stone-300 flex flex-col justify-between border-r border-stone-800 transition-transform md:translate-x-0 md:static ${
-          mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-stone-900 text-stone-300 flex flex-col justify-between border-r border-stone-800 transition-transform duration-300 ease-in-out md:translate-x-0 md:static ${
+          mobileNavOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         <div>
           {/* Brand Header */}
           <div className="p-6 border-b border-stone-800/80 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-amber-50 shadow-md">
-                <Cake className="w-6 h-6" />
-              </div>
+              {config?.logoUrl ? (
+                <img
+                  src={config.logoUrl}
+                  alt="Logo"
+                  className="h-10 w-auto max-w-[100px] object-contain"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-amber-50 shadow-md">
+                  <Cake className="w-6 h-6" />
+                </div>
+              )}
               <div>
                 <span className="font-serif text-lg font-bold text-white block leading-tight">
-                  Delicias Belgi
+                  {config?.nombre || 'Delicias Belgi'}
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400 block mt-0.5">
                   {isAdmin ? 'Panel Administrador' : 'Terminal Cajero'}

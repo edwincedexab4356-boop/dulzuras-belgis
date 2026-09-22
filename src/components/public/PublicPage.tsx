@@ -8,6 +8,7 @@ import { LocationHoursSection } from './LocationHoursSection';
 import { Footer } from './Footer';
 import { CartDrawer } from './CartDrawer';
 import { RedesSocialesModal } from './RedesSocialesModal';
+import { FloatingPromotion } from './FloatingPromotion';
 import { Producto, CartItem, ConfiguracionNegocio } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -67,6 +68,7 @@ export const PublicPage: React.FC<PublicPageProps> = ({
           productos={productos}
           loading={loadingProductos}
           cart={cart}
+          config={config}
           onAddToCart={onAddToCart}
           onOpenCart={() => setIsCartOpen(true)}
         />
@@ -82,6 +84,14 @@ export const PublicPage: React.FC<PublicPageProps> = ({
         isOpen={isSocialModalOpen}
         onClose={() => setIsSocialModalOpen(false)}
         config={config}
+      />
+
+      {/* Floating Promotions (Auto popup on page entrance & floating tab with delete button) */}
+      <FloatingPromotion
+        config={config}
+        productos={productos}
+        onAddToCart={onAddToCart}
+        onExploreMenu={() => handleNavigate('menu')}
       />
 
       {/* Floating Sticky Bar: Pedir por WhatsApp when cart has items */}

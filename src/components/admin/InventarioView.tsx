@@ -289,7 +289,100 @@ export const InventarioView: React.FC<InventarioViewProps> = ({
           </div>
 
           <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
+            {/* Mobile Card List (under md breakpoint) */}
+            <div className="block md:hidden divide-y divide-stone-100">
+              {filteredProducts.length === 0 ? (
+                <div className="p-8 text-center text-stone-400 text-xs">
+                  No se encontraron productos en el inventario.
+                </div>
+              ) : (
+                filteredProducts.map((prod, idx) => {
+                  const currentStock = prod.stock ?? 0;
+                  const minStock = prod.stockMinimo ?? 5;
+                  const isLow = currentStock <= minStock && currentStock > 0;
+                  const isZero = currentStock <= 0;
+
+                  return (
+                    <div key={prod.id ? `mob-inv-${prod.id}-${idx}` : `mob-inv-prod-${idx}`} className="p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-bold text-stone-900 text-sm">{prod.nombre}</h4>
+                          <span className="text-[11px] text-stone-500">{prod.categoria} • {formatCurrency(prod.precio)}</span>
+                          <div className="text-[10px] text-stone-400 mt-0.5">Mínimo sugerido: {minStock} uds.</div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`font-mono text-base font-bold ${
+                              isZero
+                                ? 'text-rose-600'
+                                : isLow
+                                ? 'text-amber-600'
+                                : 'text-emerald-700'
+                            }`}
+                          >
+                            {currentStock} <span className="text-[10px] text-stone-400 font-normal">uds.</span>
+                          </span>
+                          {isZero && (
+                            <span className="block px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-bold mt-0.5">
+                              Agotado
+                            </span>
+                          )}
+                          {isLow && (
+                            <span className="block px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold mt-0.5">
+                              Stock Bajo
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-stone-100">
+                        {/* Quick 1-click +1 and -1 */}
+                        <div className="inline-flex items-center gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200">
+                          <button
+                            onClick={() => handleQuickDelta(prod, -1)}
+                            disabled={loading || currentStock <= 0}
+                            className="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 text-rose-700 border border-stone-200 flex items-center justify-center font-bold text-xs shadow-2xs transition-all disabled:opacity-40 cursor-pointer"
+                            title="Quitar 1 unidad directamente del stock"
+                          >
+                            <Minus className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="px-2 font-mono text-xs font-bold text-stone-700">
+                            {currentStock}
+                          </span>
+                          <button
+                            onClick={() => handleQuickDelta(prod, 1)}
+                            disabled={loading}
+                            className="w-7 h-7 rounded-lg bg-white hover:bg-emerald-50 text-emerald-700 border border-stone-200 flex items-center justify-center font-bold text-xs shadow-2xs transition-all disabled:opacity-40 cursor-pointer"
+                            title="Sumar 1 unidad al stock"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Adjust buttons */}
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => handleOpenAdjustment(prod, 'salida')}
+                            className="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-colors cursor-pointer"
+                          >
+                            - Salida
+                          </button>
+                          <button
+                            onClick={() => handleOpenAdjustment(prod, 'entrada')}
+                            className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer"
+                          >
+                            + Entrada
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Desktop Table (hidden on mobile) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs text-stone-600">
                 <thead className="bg-stone-50 border-b border-stone-200 text-stone-700 font-bold uppercase tracking-wider text-[10px]">
                   <tr>

@@ -294,7 +294,74 @@ export const ProduccionView: React.FC<ProduccionViewProps> = ({
         </div>
 
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
+          {/* Mobile Card List (under md breakpoint) */}
+          <div className="block md:hidden divide-y divide-stone-100">
+            {filtered.length === 0 ? (
+              <div className="p-8 text-center text-stone-400 text-xs">
+                No hay registros de producción que coincidan.
+              </div>
+            ) : (
+              filtered.map((prodReg, idx) => {
+                const isBaja = (prodReg as any).esBaja === true || (prodReg as any).tipoOperacion === 'baja';
+                return (
+                  <div key={prodReg.id ? `mob-prod-${prodReg.id}-${idx}` : `mob-prod-reg-${idx}`} className="p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="font-bold text-stone-900 text-sm">{prodReg.producto}</h4>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="font-mono text-[10px] font-bold text-stone-700 bg-stone-100 px-1.5 py-0.5 rounded">
+                            {prodReg.lote || 'SIN LOTE'}
+                          </span>
+                          <span className="text-[10px] text-stone-400">
+                            {formatFechaCorta(prodReg.fecha)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {isBaja ? (
+                          <span className="inline-flex items-center gap-1 font-mono font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200 text-xs">
+                            <Minus className="w-3 h-3" />
+                            <span>{prodReg.cantidad} uds. (Baja)</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 text-xs">
+                            <Plus className="w-3 h-3" />
+                            <span>{prodReg.cantidad} uds. (Entrada)</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-stone-600 bg-stone-50 p-2 rounded-xl flex items-center justify-between">
+                      <span className="text-[11px] text-stone-500">
+                        Resp: <strong className="text-stone-800">{prodReg.responsable || 'Equipo de cocina'}</strong>
+                      </span>
+                      <button
+                        onClick={() => {
+                          setRecordToDelete(prodReg);
+                          setCodeDelete('');
+                          setCodeError(null);
+                        }}
+                        className="px-2 py-1 rounded-lg text-rose-600 hover:bg-rose-50 border border-rose-200 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Eliminar</span>
+                      </button>
+                    </div>
+
+                    {(prodReg.observacion || prodReg.notas) && (
+                      <p className="text-[11px] text-stone-500 italic pl-1">
+                        "{prodReg.observacion || prodReg.notas}"
+                      </p>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs text-stone-600">
               <thead className="bg-stone-50 border-b border-stone-200 text-stone-700 font-bold uppercase tracking-wider text-[10px]">
                 <tr>

@@ -272,6 +272,7 @@ export default function App() {
           currentTab={effectiveTab}
           onSelectTab={(tab) => setAdminTab(tab)}
           user={currentUser}
+          config={config}
           onLogout={handleLogout}
           onBackToPublic={handleBackToPublic}
         >
@@ -333,12 +334,16 @@ export default function App() {
           {isAdmin && effectiveTab === 'usuarios' && (
             <UsuariosView
               usuarios={usuarios}
+              config={config}
+              onRefreshData={handleRefreshData}
             />
           )}
 
           {isAdmin && effectiveTab === 'configuracion' && (
             <ConfiguracionView
               config={config}
+              productos={productos}
+              onRefreshData={handleRefreshData}
             />
           )}
         </AdminLayout>

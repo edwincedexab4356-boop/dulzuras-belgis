@@ -94,7 +94,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <img
                   src={config.logoUrl}
                   alt={brandName}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shadow-lg border-2 border-lime-400"
+                  className="max-h-24 sm:max-h-28 w-auto max-w-[220px] object-contain drop-shadow-md"
                 />
               ) : (
                 <BelgisLogo size={88} className="shadow-lg" showDetails={false} />
